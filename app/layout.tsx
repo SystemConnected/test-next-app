@@ -1,38 +1,18 @@
-'use client';
-import type { Metadata } from "next";
-import "./globals.css";
-import Header from "@/components/Header";
-import Sidebar from "@/components/Sidebar";
-import { Provider } from "react-redux";
+// app/layout.tsx
+"use client";
+
+import { AuthProvider } from "@/context/AuthContext";
 import store from "@/redux/store";
+import { Provider } from "react-redux";
 
-
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <Provider store={store}>
-      <html lang="en">
-        <body className="antialiased bg-gray-50"> {/* Add background and other styles */}
-          {/* Main layout container */}
-          <div className="flex min-h-screen">
-            {/* Sidebar - Add responsive visibility if needed */}
-            <Sidebar />
-            
-            {/* Content area */}
-            <div className="flex-1 flex flex-col">
-              {/* Header */}
-              <Header />
-              
-              {/* Main content (children pages) */}
-              <main className="flex-1 p-4">{children}</main>
-            </div>
-          </div>
-        </body>
-      </html>
-    </Provider>
+    <html lang="en">
+      <body>
+        <Provider store={store}>
+          {children}
+        </Provider>
+      </body>
+    </html>
   );
 }

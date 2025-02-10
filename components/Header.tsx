@@ -1,7 +1,7 @@
 'use client'
 import { setIsopenSidebar } from "@/redux/slices/layoutSlice";
 import { RootState } from "@/redux/store";
-import { Menu } from "lucide-react"; // for icons Libarary
+import { SquareChevronLeft, SquareChevronRight } from "lucide-react"; // for icons Libarary
 import { useDispatch, useSelector } from "react-redux";
 
 export default function Header() {
@@ -13,7 +13,7 @@ export default function Header() {
             <div className="border-black border"   >
                <div onClick={()=> dispatch(setIsopenSidebar(!isOpenSidebar))}>
 
-                <Menu />
+               {isOpenSidebar ? <SquareChevronLeft />:<SquareChevronRight />}
                </div>
             </div>
 
