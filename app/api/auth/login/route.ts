@@ -1,43 +1,51 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-
-const users = [
-  {
-    id: 1,
-    name: "John Doe",
-    email: "john.doe@example.com",
-    password: bcrypt.hashSync("password123", 10),
-    },
-    {
-      id: 2,
-      name: "Jane Doe",
-      email: "jane.doe@example.com",
-      password: bcrypt.hashSync("password123", 10),
-      },
-]; // Temporary in-memory user storage
-
-const SECRET_KEY = process.env.JWT_SECRET || "mysecretkey"; // Store securely in .env
+import { User } from "@/models/User";
+import { generateToken, validateEmail } from "@/lib/utils";
+import { connectDB } from "@/lib/mongodb";
 
 export async function POST(req: Request) {
   const { email, password } = await req.json();
-  
-  const user = users.find(user => user.email === email);
-  if (!user) {
-    return NextResponse.json({ message: "Invalid credentials" }, { status: 401 });
+  try {
+
+    if (!email) {
+      return NextResponse.json({ message: "Email is required", status: 400 }, { status: 400 });
+    }
+
+    if (validateEmail(email) === false) {
+      return NextResponse.json({ message: "Invalid email", status: 400 }, { status: 400 });
+    }
+
+    if (!password) {
+      return NextResponse.json({ message: "Password is required", status: 400 }, { status: 400 });
+    }
+
+    await connectDB();
+
+    const user = await User.findOne({ email });
+
+    //Create Login APi
+    if (!user) {
+      return NextResponse.json({ message: "User Not Found", status: 404 }, { status: 404 });
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user?.password);
+
+    if (!passwordMatch) {
+      return NextResponse.json({ message: "Invalid credentials", status: 401 }, { status: 401 });
+    } 
+
+    // Generate JWT token
+    const token = generateToken(user);
+    // Store JWT in an HttpOnly cookie
+
+    const response = NextResponse.json({user,status: 200,token }, { status: 200 });
+    response.headers.set("Set-Cookie", `token=${token}; HttpOnly; Path=/; Max-Age=3600`);
+
+    return response;
   }
-
-  const passwordMatch = await bcrypt.compare(password, user.password);
-  if (!passwordMatch) {
-    return NextResponse.json({ message: "Invalid credentials" }, { status: 401 });
+  catch (error) {
+    console.error("Login Error:", error);
+    return NextResponse.json({ status: 500, message: "Internal Server Error" }, { status: 500 })
   }
-
-  // Generate JWT token
-  const token = jwt.sign({ id: user.id, email: user.email }, SECRET_KEY, { expiresIn: "1h" });
-
-  // Store JWT in an HttpOnly cookie
-  const response = NextResponse.json({ user: { id: user.id, name: user.name, email: user.email },token,status:201 });
-  response.headers.set("Set-Cookie", `token=${token}; HttpOnly; Path=/; Max-Age=3600`);
-  
-  return response;
 }
