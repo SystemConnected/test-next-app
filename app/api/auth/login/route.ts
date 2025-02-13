@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { User } from "@/models/User";
 import { generateToken, validateEmail } from "@/lib/utils";
 import { connectDB } from "@/lib/mongodb";
+import { LoginDetail } from "@/models/LoginDetails";
 
 export async function POST(req: Request) {
   const { email, password } = await req.json();
@@ -33,14 +34,18 @@ export async function POST(req: Request) {
 
     if (!passwordMatch) {
       return NextResponse.json({ message: "Invalid credentials", status: 401 }, { status: 401 });
-    } 
+    }
 
     // Generate JWT token
     const token = generateToken(user);
-    // Store JWT in an HttpOnly cookie
 
-    const response = NextResponse.json({user,status: 200,token }, { status: 200 });
+    const response = NextResponse.json({ user, status: 200, token }, { status: 200 });
     response.headers.set("Set-Cookie", `token=${token}; HttpOnly; Path=/; Max-Age=3600`);
+
+    await LoginDetail.findOneAndUpdate(
+      { username: user.username },
+      { $set: { token: token } },
+      { new: true, upsert: true });
 
     return response;
   }

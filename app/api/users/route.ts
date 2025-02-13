@@ -12,15 +12,20 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+
     // Connect to MongoDB
     await connectDB();
 
+    // Token in Login User & token in not Expired
+
+
     // Fetch all users
     const allUser = await User.find();
+    const userSpecificeDetails = allUser.map(user => ({ id: user.id, username: user.username, email: user.email, name: user.name }))
 
     // Return success response
     return NextResponse.json(
-      { status: 200, message: "Users Data Fetched Successfully", user: allUser },
+      { status: 200, message: "Users Data Fetched Successfully", user: userSpecificeDetails },
       { status: 200 }
     );
   } catch (error) {

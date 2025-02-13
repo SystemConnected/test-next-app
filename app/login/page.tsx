@@ -31,7 +31,7 @@ export default function LoginPage() {
   const handleLogin = async () => {
     try {
       const response = await ApiCall<ApiResponse>('api/auth/login', { email, password });
-      if (response.status === 201) {
+      if (response.status === 200) {
         dispatch(loginSuccess(response));
         router.push('/dashboard');
       } else {
