@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 
 interface ApiResonse {
     data: any;
-    status: number;
+    status: string;
     message: string;
 }
 
@@ -17,9 +17,13 @@ const Dashboard = () => {
 
     const logout = async () => {
         try {
-            await ApiCall<ApiResonse>('/api/auth/logout', {})
-            dispatch(logoutUser());
-            router.push("/login")
+            const res = await ApiCall<ApiResonse>('/api/auth/logout', {})
+            if (res.status === "success") {
+                dispatch(logoutUser());
+                router.push("/login")
+            }else{
+                alert("Logout Failed")
+            }
         } catch (error) {
             console.log(error);
         }

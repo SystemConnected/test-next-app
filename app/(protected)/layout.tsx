@@ -6,10 +6,11 @@ import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { useEffect, ReactNode } from "react";
 
+
 const ProtectedLayout = ({ children }: { children: ReactNode }) => {
     const router = useRouter();
     const auth = useAuth();
-
+console.log(auth,"Auth")
     useEffect(() => {
         if (!auth) {
             router.push("/login"); // Redirect if not authenticated

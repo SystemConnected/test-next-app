@@ -7,17 +7,17 @@ export async function DELETE(req: NextRequest) {
         await connectDB();
         const { id } = await req.json();
         if (!id) {
-            return NextResponse.json({ status: 400, message: "Invalid Menu" }, { status: 400 })
+            return NextResponse.json({ status: "error", message: "Invalid Menu" })
         }
         const deletedMenu = await SideMenu.findByIdAndDelete(id);
         if (!deletedMenu) {
-            return NextResponse.json({ status: 404, message: "Menu not found" }, { status: 404 })
+            return NextResponse.json({ status: "error", message: "Menu not found" })
         }
-        return NextResponse.json({ status: 201, message: "Menu Deleted successfully" }, { status: 201 });
+        return NextResponse.json({ status: "success", message: "Menu Deleted successfully" });
 
     } catch (error) {
         console.error("Error updating menu:", error);
-        return NextResponse.json({ status: 500, message: "Internal Server Error" }, { status: 500 });
+        return NextResponse.json({ status: "error", message: "Internal Server Error" });
     }
 
 }

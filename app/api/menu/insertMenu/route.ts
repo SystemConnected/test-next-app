@@ -15,9 +15,9 @@ export async function POST(req: NextRequest) {
             subMenus,
         });
         await newMenu.save();
-        return NextResponse.json({ message: "Menu created successfully", status: 201 }, { status: 201 });
+        return NextResponse.json({ message: "Menu created successfully", status: "success" });
     } catch (error) {
         console.error("Error inserting menu:", error);
-        return NextResponse.json({ status: 500, message: "Internal Server Error" }, {status:500});
+        return NextResponse.json({ status: "error", message: "Internal Server Error" });
     }
 }

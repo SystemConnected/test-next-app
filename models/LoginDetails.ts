@@ -1,11 +1,16 @@
-import { model, models, Schema } from "mongoose";
+import { Document, model, models, Schema } from "mongoose";
+
+export interface ILoginDetails extends Document{
+    username:string;
+    email:string;
+    token:string;
+}
 
 const LoginDetailSchema= new Schema({
     username: {type:String,required:true},
     email: {type: String, required: true},
-    created_at: {type: Date, default: Date.now},
-    updated_at: {type: Date, default: Date.now},
     token:{type:String,required:true},
-});
+},{timestamps:true});
 
-export const LoginDetail= models.LoginDetail||model("LoginDetail",LoginDetailSchema)
+ const LoginDetail= models.LoginDetail||model<ILoginDetails>("LoginDetail",LoginDetailSchema)
+ export default LoginDetail;

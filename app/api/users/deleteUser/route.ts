@@ -8,17 +8,17 @@ export async function DELETE(req: Request) {
         await connectDB();
         const { id } = await req.json();
         if (!id) {
-            return NextResponse.json({ status: 400, message: "Invalid User" }, { status: 400, })
+            return NextResponse.json({ status: "error", message: "Invalid User" })
         }
         const deletedUser = await User.findByIdAndDelete(id);
         if (!deletedUser) {
-            return NextResponse.json({ status: 404, message: "User not found" }, {status: 404,})
+            return NextResponse.json({ status: "error", message: "User not found" })
         }
 
-        return NextResponse.json({ status: 201, message: "User Deleted successfully", }, { status: 201 });
+        return NextResponse.json({ status: "success", message: "User Deleted successfully", });
     }
     catch (err) {
         console.log(err);
-        return NextResponse.json({ status: 500, message: "Internal Server Error" }, { status: 500 })
+        return NextResponse.json({ status: "error", message: "Internal Server Error" })
     }
 }

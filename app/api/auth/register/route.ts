@@ -9,27 +9,34 @@ export async function POST(req: Request) {
   try {
     await connectDB();
     const { name, email, password } = await req.json();
+
+    if (!name || !email || !password ) {
+      return NextResponse.json({ status: "error", message: "All fields are required" });
+    }
     // check user exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return NextResponse.json({ status: 400, message: "User already exists" }, { status: 400 })
+      return NextResponse.json({ status: "error", message: "User already exists" })
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-     // Fetch default menu
+    const username = generateUsername(email); 
+    
+    // Fetch default menu
      const defaultMenu = await SideMenu.find(); // Fetch all available menus
-     const assignedMenus = defaultMenu.map(menu => ({
+     const assignedMenus = defaultMenu
+     .filter(menu=>menu.isActive && menu.permissions.includes("user")) // Filter active menus
+     .map(menu => ({
        menuId: menu._id,
-       permissions: ["admin"], // Default permission
+       permissions: menu.permissions, // Default permission
      }));
-    const username = generateUsername(email);
-    const newUser = { name, email, username, password: hashedPassword, menus: assignedMenus };
+    
+    const newUser = { name, email, username, password: hashedPassword, menuPermissions: assignedMenus };
     await User.create(newUser);
-    // Generate JWT token
-    return NextResponse.json({ status: 201, message: "User created successfully", }, { status: 201 });
+    return NextResponse.json({ status: "success", message: "User created successfully", });
   }
   catch (error) {
     console.error("Register Error:", error);
-    return NextResponse.json({ status: 500, message: "Internal Server Error" }, { status: 500 })
+    return NextResponse.json({ status: "error", message: "Internal Server Error" })
   }
 }

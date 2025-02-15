@@ -1,24 +1,22 @@
 import { NextResponse } from "next/server";
-import { User } from "@/models/User";
 import { connectDB } from "@/lib/mongodb";
-import { cookies } from "next/headers";
+import LoginDetail from "@/models/LoginDetails";
 
-export async function GET() {
-
+export async function POST(req: NextResponse) {
     try {
-        await connectDB();
-        const sessionToken = cookies().get("sessionToken").value;
-        if (!sessionToken) {
-            return NextResponse.json({ user: null, status: 401 }, { status: 401 });
-        }
-        // Mock authentication (in real apps, decode JWT or fetch session)
-        const user = User.find((user: any) => `token-${user.id}` === sessionToken);
+        const { token } = await req.json();
+        if (!token) {
+            return NextResponse.json({ message: "Token is required", status: "error" });
+        };
 
+        await connectDB();
+        const user = await LoginDetail.findOne({ token: token });
         if (!user) {
-            return NextResponse.json({ user: null, status: 401 }, { status: 401 });
+            return NextResponse.json({ message: "Invalid token", isValid: false, status: "error" });
         }
-        return NextResponse.json({ user, status: 200 }, { status: 200 });
-    } catch (error) {
-        return NextResponse.json({ error, status: 500 }, { status: 500 });
+        return NextResponse.json({ isValid: true, status: 200 });
+
+    } catch {
+        return NextResponse.json({ isValid: false, status: "error" });
     }
 }

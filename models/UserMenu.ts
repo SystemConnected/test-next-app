@@ -23,7 +23,7 @@ export interface ISideMenu extends Document {
 const SubMenuSchema = new Schema<ISubMenu>({
     title: { type: String, required: true },
     path: { type: String, required: true },
-    permissions: [{ type: String, enum: ["read", "write", "delete", "admin"] }],
+    permissions: [{ type: String, enum: ["read", "write", "delete", "admin",'user   '] }],
     isActive: { type: Boolean, default: true },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
@@ -33,7 +33,7 @@ const SubMenuSchema = new Schema<ISubMenu>({
 const SideMenuSchema = new Schema<ISideMenu>({
     title: { type: String, required: true },
     path: { type: String, required: true },
-    permissions: [{ type: String, enum: ['read', 'write', 'delete', 'admin'] }],
+    permissions: [{ type: String, enum: ['read', 'write', 'delete', 'admin','user'] }],
     isActive: { type: Boolean, default: true },
     subMenus: [SubMenuSchema],
     createdAt: { type: Date, default: Date.now },

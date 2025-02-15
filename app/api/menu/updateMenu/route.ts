@@ -20,12 +20,12 @@ export async function PUT(req: NextRequest) {
             subMenus,
         }, { new: true });
         if (!updatedMenu) {
-            return NextResponse.json({ status: 404, message: "Menu not found" }, { status: 404 })
+            return NextResponse.json({ status: "error", message: "Menu not found" })
         }
-        return NextResponse.json({ status: 201, message: "Menu Updated successfully"}, { status: 201 });
+        return NextResponse.json({ status: "success", message: "Menu Updated successfully"});
     }
     catch (error) {
         console.error("Error updating menu:", error);
-        return NextResponse.json({ status: 500, message: "Internal Server Error" }, { status: 500 });
+        return NextResponse.json({ status: "error", message: "Internal Server Error" });
       }
     }

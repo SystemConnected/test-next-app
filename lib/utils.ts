@@ -8,6 +8,16 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+//Get user From token
+export const getUserFromToken = (token: string) => {
+  try {
+    const decoded = jwt.verify(token, SECRET_KEY);
+    return decoded;
+  } catch (error) {
+    return null;
+  }
+}
+
 export async function ApiCall<T>(
   url: string,
   bodyData: Record<string, any> = {},
@@ -35,7 +45,9 @@ export async function ApiCall<T>(
     if (!response.ok) {
       throw new Error(`API Error: ${response.status} ${response.statusText}`);
     }
+    
     return await response.json();
+
   } catch (error) {
     console.error("API Call Failed:", error);
     throw error;
@@ -49,7 +61,7 @@ export const validateEmail = (email: string) => {
 
 //Generate Jwt token
 export const generateToken = (data: Record<string, any>) => {
-  const token = jwt.sign({ id: data.id, email: data.email }, SECRET_KEY, { expiresIn: "1h" });
+  const token = jwt.sign({ id: data.id, email: data.email, role: data.role, username: data.username }, SECRET_KEY, { expiresIn: "1h" });
   return token;
 }
 
@@ -67,3 +79,47 @@ export function generateUsername(email: string): string {
 
   return username;
 }
+
+// Utility functions for localStorage
+export const getLocalStorageItem = (key: string) => {
+  if (typeof window === "undefined") return null;
+  try {
+    const item = localStorage.getItem(key);
+    return item ? JSON.parse(item) : null;
+  } catch (error) {
+    console.error(`Error parsing localStorage key "${key}":`, error);
+    return null;
+  }
+};
+
+export const setLocalStorageItem = (key: string, value: any) => {
+  if (typeof window !== "undefined") {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+};
+
+export const removeLocalStorageItem = (key: string) => {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem(key);
+  }
+};
+
+export const setCookie = (name: string, value: string, days: number) => {
+  let expires = "";
+  if (days) {
+    const date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    expires = "; expires=" + date.toUTCString();
+  }
+  document.cookie = name + "=" + (value || "") + expires + "; path=/";
+};
+
+export const getCookie = (name: string) => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts?.pop()?.split(';').shift();
+};
+
+export const deleteCookie = (name: string) => {
+  setCookie(name, "", -1);
+};

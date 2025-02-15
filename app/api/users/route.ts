@@ -25,15 +25,13 @@ export async function GET(req: NextRequest) {
 
     // Return success response
     return NextResponse.json(
-      { status: 200, message: "Users Data Fetched Successfully", user: userSpecificeDetails },
-      { status: 200 }
+      { status: "success", message: "Users Data Fetched Successfully", user: userSpecificeDetails },
     );
   } catch (error) {
     // Log the error and return an error response
     console.error("Users Data Fetching Error:", error);
     return NextResponse.json(
-      { status: 500, message: "Internal Server Error" },
-      { status: 500 }
+      { status: "error", message: "Internal Server Error" },
     );
   }
 }

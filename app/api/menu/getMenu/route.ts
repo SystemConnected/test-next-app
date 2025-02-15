@@ -1,18 +1,32 @@
+"use server";
 import { connectDB } from "@/lib/mongodb";
+import { getUserFromToken } from "@/lib/utils";
+import { User } from "@/models/User";
 import { SideMenu } from "@/models/UserMenu";
-import {  NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-
-export async function GET() {
+export async function GET(req: NextRequest) {
     try {
         await connectDB();
-       const menu = await SideMenu.find();
-       const menuData = menu.map(menu => (menu.isActive ? { id: menu.id, title: menu.title, path: menu.path, permissions: menu.permissions,  subMenus: menu.subMenus }: null)).filter(Boolean);
-       return NextResponse.json({ status: 200, message: "Menu Data Fetched Successfully", menuData }, { status: 200 });
- 
+        const token = req.cookies.get("token")?.value;
+
+        if (!token) {
+            return NextResponse.json({ status: "error", message: "Unauthorized" });
+        }
+        const user:any = getUserFromToken(token);
+        if (!user) {
+            return NextResponse.json({ status: "error", message: "Invalid Token" });
+        }
+        console.log("userData:", user);
+       
+
+        const menu = await SideMenu.find();
+        const menuData = menu.map(menu => (menu.isActive ? { id: menu.id, title: menu.title, path: menu.path, subMenus: menu.subMenus } : null)).filter(Boolean);
+        return NextResponse.json({ status: "success", message: "Menu Data Fetched Successfully", menuData });
+
     } catch (error) {
         console.error("Error fetching menu:", error);
-        return NextResponse.json({ status: 500, message: "Internal Server Error" }, { status: 500 });
+        return NextResponse.json({ status: "error", message: "Internal Server Error" });
 
     }
 
